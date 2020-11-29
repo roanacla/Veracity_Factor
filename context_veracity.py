@@ -124,3 +124,24 @@ class Context_Veracity():
     #print("Count is", count, "and Post is", post)  
     
     return count
+  
+  def encode(self, X_train):
+    bcv_tc = []
+    bcv_v = []
+    for s in X_train['Statement'].tolist():
+        tc, v = cv.get_source_count_and_veracity(s)
+        bcv_tc.append(tc)
+        bcv_v.append(v)
+    bcv_d = {'title_count': bcv_tc, 'veracity': bcv_v}
+    bcv_e_X_train = pd.DataFrame(data=bcv_d)
+    from google_drive_downloader import GoogleDriveDownloader as gdd
+    gdd.download_file_from_google_drive(file_id='1Pu0D6GffO5fBgXVCVnKcEAPr9lrbAYfK',
+                                      dest_path='./bcv_encoder.zip',
+                                      unzip=False)
+    archive = ZipFile('bcv_encoder.zip')
+    for file in archive.namelist():
+        archive.extract(file, '/content/')
+    bcv_encoder = keras.models.load_model('/content/bcv_encoder')
+    bcv_e_X_train = bcv_encoder.predict(df_posts[['title_count', 'veracity']])
+    
+    return bcv_e_X_train
