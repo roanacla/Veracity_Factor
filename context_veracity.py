@@ -41,6 +41,15 @@ class Context_Veracity():
     else:
       veracity = 0
     return self.get_veracity(veracity, source_count)
+  
+  def get_source_count_and_veracity(self, title):
+  #calculate title_count on veracity
+    source_count = self.find_similar_articles(title)
+    if(source_count > 3):
+      veracity = 1
+    else:
+      veracity = 0
+    return (source_count,veracity)
 
   def get_veracity(self, veracity, title_count):
     df = pd.DataFrame(columns=['veracity', 'title_count'])
